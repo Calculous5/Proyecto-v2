@@ -121,6 +121,7 @@ begin
                    
     mux_s_sel <= "00" when rom_dataout(31) = '1' else
                  "01" when rom_dataout(32) = '1' else
+                 "10" when rom_dataout(33) = '1' else
                  "00";
                  
     ram_write <= rom_dataout(30);
@@ -129,10 +130,10 @@ begin
         '1' when rom_dataout(36) = '1' else
         '1' when (rom_dataout(37) = '1' and status_out(1) = '1') else
         '1' when (rom_dataout(38) = '1' and status_out(1) = '0') else
-        '1' when (rom_dataout(39) = '1' and status_out(0) = '0' and status_out(1) = '0') else
-        '1' when (rom_dataout(40) = '1' and status_out(0) = '0') else
-        '1' when (rom_dataout(41) = '1' and status_out(0) = '1') else
-        '1' when (rom_dataout(42) = '1' and (status_out(0) = '1' or status_out(1) = '1')) else
+        '1' when (rom_dataout(39) = '1' and status_out(2) = '0' and status_out(1) = '0') else
+        '1' when (rom_dataout(40) = '1' and status_out(2) = '0') else
+        '1' when (rom_dataout(41) = '1' and status_out(2) = '1') else
+        '1' when (rom_dataout(42) = '1' and (status_out(2) = '1' or status_out(1) = '1')) else
         '1' when (rom_dataout(43) = '1' and status_out(2) = '1') else
         '0';
         
@@ -156,6 +157,7 @@ begin
         mux_s_out <=
             literal_value(11 downto 0) when "00",
             out_b(11 downto 0) when "01",
+            out_a(11 downto 0) when "10",
             (others => '0') when others;
             
     use_alu <= '1' when alu_op /= "00000000" else '0';
@@ -168,7 +170,7 @@ begin
     
     rom_address <= pc_q;
     ram_address <= mux_s_out;
-    ram_datain <= out_a;
+    ram_datain <= alu_result when use_alu = '1' else mux_two_out;
     
     SRF: Super_Register_File port map (
         clock => clock,
